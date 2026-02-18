@@ -1,6 +1,5 @@
-flask==3.1.2
+flask
 moviepy==1.0.3
-gunicorn==21.2.0
-imageio-ffmpeg==0.4.9
-numpy==1.26.4
-setuptools==82.0.0
+gunicorn
+imageio-ffmpeg
+numpy
