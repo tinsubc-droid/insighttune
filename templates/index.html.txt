@@ -1,9 +1,0 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>InsightTune</title>
-</head>
-<body>
-    <h1>InsightTune Frontend Working ✅</h1>
-</body>
-</html>
