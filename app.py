@@ -1,7 +1,10 @@
-from flask import Flask, render_template
+from flask import Flask
+import os
 
 app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return """
+    <h1>Server is Working ✅</h1>
+    """
