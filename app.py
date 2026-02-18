@@ -1,11 +1,8 @@
-import traceback
+import os
 from flask import Flask, render_template
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="insighttune/templates")
 
 @app.route("/")
 def home():
-    try:
-        return render_template("index.html")
-    except Exception:
-        return f"<pre>{traceback.format_exc()}</pre>"
+    return render_template("index.html")
