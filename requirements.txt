@@ -1,5 +1,5 @@
 flask
-moviepy==1.0.3
 gunicorn
+moviepy==1.0.3
 imageio-ffmpeg
 numpy
