@@ -1,70 +1,67 @@
-from flask import Flask, request, send_file
-from moviepy.editor import *
 import os
-import uuid
+from flask import Flask, render_template, request, send_file
+from moviepy.editor import ImageClip, AudioFileClip
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+# Create folders if not exist
 UPLOAD_FOLDER = "uploads"
+OUTPUT_FOLDER = "outputs"
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+
 
 @app.route("/")
 def home():
-    return "InsightTune Backend Running"
+    return render_template("index.html")
+
 
 @app.route("/generate", methods=["POST"])
 def generate_video():
+    try:
+        if "audio" not in request.files or "image" not in request.files:
+            return "Audio or Image not uploaded"
 
-    mp3 = request.files["mp3"]
-    background_img = request.files["background"]
-    artist_photo = request.files["photo"]
+        audio_file = request.files["audio"]
+        image_file = request.files["image"]
 
-    title = request.form.get("title", "")
-    singer = request.form.get("singer", "")
-    cover_by = request.form.get("cover_by", "")
+        if audio_file.filename == "" or image_file.filename == "":
+            return "No file selected"
 
-    unique_id = str(uuid.uuid4())
+        # Secure filenames
+        audio_filename = secure_filename(audio_file.filename)
+        image_filename = secure_filename(image_file.filename)
 
-    mp3_path = os.path.join(UPLOAD_FOLDER, unique_id + ".mp3")
-    bg_path = os.path.join(UPLOAD_FOLDER, unique_id + "_bg.jpg")
-    photo_path = os.path.join(UPLOAD_FOLDER, unique_id + "_photo.jpg")
-    output_path = os.path.join(UPLOAD_FOLDER, unique_id + ".mp4")
+        audio_path = os.path.join(UPLOAD_FOLDER, audio_filename)
+        image_path = os.path.join(UPLOAD_FOLDER, image_filename)
 
-    mp3.save(mp3_path)
-    background_img.save(bg_path)
-    artist_photo.save(photo_path)
+        audio_file.save(audio_path)
+        image_file.save(image_path)
 
-    audio = AudioFileClip(mp3_path)
-    duration = audio.duration
+        # Load media
+        audio = AudioFileClip(audio_path)
+        image = ImageClip(image_path)
 
-    # Background
-    background = ImageClip(bg_path).set_duration(duration).resize((1920,1080))
+        # Set video duration equal to audio
+        video = image.set_duration(audio.duration)
+        video = video.set_audio(audio)
 
-    # Artist Photo
-    photo = ImageClip(photo_path).resize(height=400)
-    photo = photo.set_position(("center", 300)).set_duration(duration)
+        output_path = os.path.join(OUTPUT_FOLDER, "final_video.mp4")
 
-    # Title
-    title_text = TextClip(
-        title,
-        fontsize=80,
-        color="white",
-        size=(1800,None)
-    ).set_position(("center", 750)).set_duration(duration)
+        video.write_videofile(
+            output_path,
+            fps=24,
+            codec="libx264",
+            audio_codec="aac"
+        )
 
-    # Info
-    info_text = TextClip(
-        f"Singer: {singer}   |   Cover By: {cover_by}",
-        fontsize=45,
-        color="white",
-        size=(1800,None)
-    ).set_position(("center", 850)).set_duration(duration)
+        return send_file(output_path, as_attachment=True)
 
-    final = CompositeVideoClip([background, photo, title_text, info_text])
-    final = final.set_audio(audio)
+    except Exception as e:
+        return f"Error occurred: {str(e)}"
 
-    final.write_videofile(output_path, fps=24)
-
-    return send_file(output_path, as_attachment=True)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=10000)
