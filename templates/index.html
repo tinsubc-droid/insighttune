@@ -1,1 +1,27 @@
-<!DOCTYPE html> <html> <head> <title>InsightTune</title> </head> <body> <h1>It is working now ✅</h1> </body> </html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>InsightTune - MP3 to Video</title>
+</head>
+<body style="text-align:center; font-family:Arial; margin-top:80px; background:#0f0f1a; color:white;">
+
+    <h1>InsightTune 🎵</h1>
+    <h3>Create Simple Music Video</h3>
+
+    <form action="/convert" method="POST" enctype="multipart/form-data">
+
+        <input type="text" name="title" placeholder="Song Title" required>
+        <br><br>
+
+        <input type="text" name="cover" placeholder="Covered By" required>
+        <br><br>
+
+        <input type="file" name="file" accept=".mp3" required>
+        <br><br>
+
+        <button type="submit">Generate Video</button>
+
+    </form>
+
+</body>
+</html>
