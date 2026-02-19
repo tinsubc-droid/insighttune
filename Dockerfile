@@ -1,6 +1,5 @@
 FROM python:3.11-slim
 
-# Install ImageMagick
 RUN apt-get update && \
     apt-get install -y imagemagick && \
     apt-get clean
